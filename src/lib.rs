@@ -1,4 +1,5 @@
 extern crate hyper;
+
 #[macro_use]
 extern crate serde_json;
 extern crate env_logger;
@@ -9,6 +10,7 @@ use std::io::Read;
 #[derive(Debug)]
 pub enum GolosdError {
     CallFailed,
+    HttpError(hyper::Error),
 }
 
 pub fn call(api: String,
@@ -26,10 +28,9 @@ pub fn call(api: String,
 
     let client = Client::new();
 
-    let mut res = client.post(RPC_ENDPOINT)
+    let mut res = try!(client.post(RPC_ENDPOINT)
         .body(&serde_json::to_string(&value).unwrap())
-        .send()
-        .unwrap();
+        .send().map_err(GolosdError::HttpError));
 
     let mut s = String::new();
     res.read_to_string(&mut s).unwrap();
