@@ -68,7 +68,7 @@ mod tests {
         let api = GolosApi::DatabaseApi;
         let api_method = "get_dynamic_global_properties".to_string();
         let args = vec![];
-        let response_map = json!(call(api, api_method, args).unwrap());
+        let response_map = call(api, api_method, args).unwrap();
         assert!(response_map["result"]["head_block_number"].as_u64().unwrap() > 3000000);
     }
 
@@ -77,7 +77,7 @@ mod tests {
         let api = GolosApi::DatabaseApi;
         let api_method = "get_content".to_string();
         let args = vec!["hipster".to_string(), "iniciativa-kiber-fonda-po-podderzhke-otkrytogo-iskhodnogo-koda-v-golose".to_string()];
-        let response_map = json!(call(api, api_method, args).unwrap());
+        let response_map = call(api, api_method, args).unwrap();
         assert!(response_map["result"]["title"].as_str().unwrap() == "Инициатива кибер•Фонда по поддержке открытого исходного кода в Голосе");
     }
 
@@ -87,7 +87,7 @@ mod tests {
         let api_method = "get_followers".to_string();
         let args =
             vec!["ontofractal".to_string(), "".to_string(), "blog".to_string(), "100".to_string() ];
-        let response_map = json!(call(api, api_method, args).unwrap());
+        let response_map = call(api, api_method, args).unwrap();
         assert!( !response_map["result"][0]["follower"].as_str().unwrap().is_empty() );
     }
 }
