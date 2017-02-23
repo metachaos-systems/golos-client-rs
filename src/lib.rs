@@ -62,7 +62,7 @@ mod tests {
     use super::*;
     #[test]
     fn get_dynamic_props_rpc_call_succeeds() {
-        let api = "database_api".to_string();
+        let api = GolosApi::DatabaseApi;
         let api_method = "get_dynamic_global_properties".to_string();
         let args = vec![];
         let response_map = json!(call(api, api_method, args).unwrap());
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn get_content_rpc_call_succeeds() {
-        let api = "database_api".to_string();
+        let api = GolosApi::DatabaseApi;
         let api_method = "get_content".to_string();
         let args = vec!["hipster".to_string(), "iniciativa-kiber-fonda-po-podderzhke-otkrytogo-iskhodnogo-koda-v-golose".to_string()];
         let response_map = json!(call(api, api_method, args).unwrap());
