@@ -26,9 +26,9 @@ pub fn call(api: GolosApi,
             -> Result<serde_json::Value, GolosError> {
     const RPC_ENDPOINT: &'static str = "http://node.golos.ws/rpc";
 
-    let api_str = match api {
+    let api_str: String = match api {
         GolosApi::DatabaseApi => "database_api".to_string(),
-        GolosApi::FollowsApi => "follows_api".to_string(),
+        GolosApi::FollowsApi => "follow_api".to_string(),
     };
 
     let value = json!({
@@ -76,5 +76,16 @@ mod tests {
         let args = vec!["hipster".to_string(), "iniciativa-kiber-fonda-po-podderzhke-otkrytogo-iskhodnogo-koda-v-golose".to_string()];
         let response_map = json!(call(api, api_method, args).unwrap());
         assert!(response_map["result"]["title"].as_str().unwrap() == "Инициатива кибер•Фонда по поддержке открытого исходного кода в Голосе");
+    }
+
+
+    #[test]
+    fn get_followers_rpc_call_succeeds() {
+        let api = GolosApi::FollowsApi;
+        let api_method = "get_followers".to_string();
+        let args =
+            vec!["ontofractal".to_string(), "".to_string(), "blog".to_string(), "100".to_string() ];
+        let response_map = json!(call(api, api_method, args).unwrap());
+        assert!( !response_map["result"][0]["follower"].as_str().unwrap().is_empty() );
     }
 }
