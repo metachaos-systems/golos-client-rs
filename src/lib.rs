@@ -11,8 +11,8 @@ use std::io::Read;
 pub enum GolosError {
     CallFailed,
     Http(hyper::Error),
-    SerdeJsonParsing(serde_json::Error),
-    ReadResponse(std::io::Error),
+    JsonParsing(serde_json::Error),
+    ResponseIo(std::io::Error),
 }
 
 pub enum GolosApi {
@@ -48,9 +48,8 @@ pub fn call(api: GolosApi,
         .map_err(GolosError::Http));
 
     let mut s = String::new();
-    try!(res.read_to_string(&mut s).map_err(GolosError::ReadResponse));
-    let json: serde_json::Value =
-        try!(serde_json::from_str(&s).map_err(GolosError::SerdeJsonParsing));
+    try!(res.read_to_string(&mut s).map_err(GolosError::ResponseIo));
+    let json: serde_json::Value = try!(serde_json::from_str(&s).map_err(GolosError::JsonParsing));
 
     match json["error"].is_string() {
         false => Ok(json),
