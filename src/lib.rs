@@ -15,17 +15,27 @@ pub enum GolosError {
     ReadResponse(std::io::Error),
 }
 
-pub fn call(api: String,
+pub enum GolosApi {
+    DatabaseApi,
+    FollowsApi,
+}
+
+pub fn call(api: GolosApi,
             api_method: String,
             args: Vec<String>)
             -> Result<serde_json::Value, GolosError> {
     const RPC_ENDPOINT: &'static str = "http://node.golos.ws/rpc";
 
+    let api_str = match api {
+        GolosApi::DatabaseApi => "database_api".to_string(),
+        GolosApi::FollowsApi => "follows_api".to_string(),
+    };
+
     let value = json!({
         "jsonrpc": "2.0",
         "method": "call",
         "id": "1",
-        "params": [api, api_method, args]
+        "params": [api_str, api_method, args]
     });
 
     let client = Client::new();
