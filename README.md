@@ -1,6 +1,6 @@
 # golos-client-rs
 
-Rust клиент для блокчейна Голос. В процессе разработки.
+Rust клиент для блокчейна Голос.
 
 # Пример использования
 
@@ -11,15 +11,19 @@ golos-client-rs пока не опубликован на crates.io, поэто�
 golos_client = { git = "https://github.com/cyberpunk-ventures/golos-client-rs" }
 ```
 
+Основная функция модуля `call` принимает следующие аргументы: значение enum, например, GolosApi::DatabaseApi, метод API и вектор параметров для данного метода.
+
+
 ```rust
 extern crate golos_client;
 use golos::*;
 
-let api = "database_api".to_string();
+let api = GolosApi::DatabaseApi;
 let api_method = "get_dynamic_global_properties".to_string();
 let args = vec![];
 
 let response: Result<serde_json::Value, GolosError> = call(api, api_method, args);
+response["result"]["head_block_number"].as_u64().unwrap() > 3000000; // true
 ```
 
 # Дорожная карта
