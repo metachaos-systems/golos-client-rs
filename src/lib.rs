@@ -8,17 +8,17 @@ use hyper::Client;
 use std::io::Read;
 
 #[derive(Debug)]
-pub enum GolosdError {
+pub enum GolosError {
     CallFailed,
-    HttpError(hyper::Error),
-    SerdeJsonError(serde_json::Error),
+    Http(hyper::Error),
+    SerdeJsonParsing(serde_json::Error),
     ReadResponse(std::io::Error),
 }
 
 pub fn call(api: String,
             api_method: String,
             args: Vec<String>)
-            -> Result<serde_json::Value, GolosdError> {
+            -> Result<serde_json::Value, GolosError> {
     const RPC_ENDPOINT: &'static str = "http://node.golos.ws/rpc";
 
     let value = json!({
@@ -33,16 +33,16 @@ pub fn call(api: String,
     let mut res = try!(client.post(RPC_ENDPOINT)
         .body(&serde_json::to_string(&value).unwrap())
         .send()
-        .map_err(GolosdError::HttpError));
+        .map_err(GolosError::Http));
 
     let mut s = String::new();
-    try!(res.read_to_string(&mut s).map_err(GolosdError::ReadResponse));
+    try!(res.read_to_string(&mut s).map_err(GolosError::ReadResponse));
     let json: serde_json::Value =
-        try!(serde_json::from_str(&s).map_err(GolosdError::SerdeJsonError));
+        try!(serde_json::from_str(&s).map_err(GolosError::SerdeJsonParsing));
 
     match json["error"].is_string() {
         false => Ok(json),
-        true => Err(GolosdError::CallFailed),
+        true => Err(GolosError::CallFailed),
     }
 }
 
