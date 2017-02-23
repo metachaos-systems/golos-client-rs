@@ -37,7 +37,8 @@ pub fn call(api: String,
 
     let mut s = String::new();
     try!(res.read_to_string(&mut s).map_err(GolosdError::ReadResponse));
-    let json: serde_json::Value = serde_json::from_str(&s).unwrap();
+    let json: serde_json::Value =
+        try!(serde_json::from_str(&s).map_err(GolosdError::SerdeJsonError));
 
     match json["error"].is_string() {
         false => Ok(json),
