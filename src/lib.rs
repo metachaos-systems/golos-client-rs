@@ -11,6 +11,8 @@ use std::io::Read;
 pub enum GolosdError {
     CallFailed,
     HttpError(hyper::Error),
+    SerdeJsonError(serde_json::Error),
+    ReadResponse(std::io::Error),
 }
 
 pub fn call(api: String,
@@ -30,10 +32,11 @@ pub fn call(api: String,
 
     let mut res = try!(client.post(RPC_ENDPOINT)
         .body(&serde_json::to_string(&value).unwrap())
-        .send().map_err(GolosdError::HttpError));
+        .send()
+        .map_err(GolosdError::HttpError));
 
     let mut s = String::new();
-    res.read_to_string(&mut s).unwrap();
+    try!(res.read_to_string(&mut s).map_err(GolosdError::ReadResponse));
     let json: serde_json::Value = serde_json::from_str(&s).unwrap();
 
     match json["error"].is_string() {
