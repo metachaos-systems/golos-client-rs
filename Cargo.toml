@@ -3,18 +3,10 @@ name = "golos-client"
 version = "0.1.0"
 authors = ["ontofractal"]
 
-[features]
-default = ["openssl"]
-ssl = ["openssl"]
-
 [dependencies]
 env_logger = "*"
+hyper-openssl = "*"
 hyper = "*"
 serde = "*"
 serde_json = "*"
 json = "*"
-
-
-[dependencies.openssl]
-openssl = "*"
-optional = true

@@ -1,10 +1,10 @@
 extern crate hyper;
+extern crate hyper_openssl;
 
 #[macro_use]
 extern crate serde_json;
 extern crate env_logger;
 
-use hyper::Client;
 use std::io::Read;
 
 #[derive(Debug)]
@@ -24,7 +24,7 @@ pub fn call(api: GolosApi,
             api_method: String,
             args: Vec<String>)
             -> Result<serde_json::Value, GolosError> {
-    const RPC_ENDPOINT: &'static str = "http://node.golos.ws/rpc";
+    const RPC_ENDPOINT: &'static str = "https://node.golos.ws/rpc";
 
     let api_str: String = match api {
         GolosApi::DatabaseApi => "database_api".to_string(),
@@ -38,7 +38,9 @@ pub fn call(api: GolosApi,
         "params": [api_str, api_method, args]
     });
 
-    let client = Client::new();
+    let ssl = hyper_openssl::OpensslClient::new().unwrap();
+    let connector = hyper::net::HttpsConnector::new(ssl);
+    let client = hyper::Client::with_connector(connector);
 
     let mut res = try!(client.post(RPC_ENDPOINT)
         .body(&serde_json::to_string(&value).unwrap())
@@ -60,6 +62,7 @@ pub fn call(api: GolosApi,
 mod tests {
     extern crate serde_json;
     use super::*;
+
     #[test]
     fn get_dynamic_props_rpc_call_succeeds() {
         let api = GolosApi::DatabaseApi;
@@ -77,7 +80,6 @@ mod tests {
         let response_map = json!(call(api, api_method, args).unwrap());
         assert!(response_map["result"]["title"].as_str().unwrap() == "Инициатива кибер•Фонда по поддержке открытого исходного кода в Голосе");
     }
-
 
     #[test]
     fn get_followers_rpc_call_succeeds() {
